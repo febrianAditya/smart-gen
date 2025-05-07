@@ -1,0 +1,7 @@
+.main-box {
+    background-color: #e3f2f2; /* warna soft blue-ish seperti UI */
+    border: 2px solid #cfdedf;
+    border-radius: 12px;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.15);
+}
+  
