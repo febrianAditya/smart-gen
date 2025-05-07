@@ -337,11 +337,11 @@ export default function MainPage() {
                         <div className="mb-3 d-flex justify-content-around align-items-center">
 
                             <div className="flex-grow-1 mx-2 border">
-                                <label for="pic-name" className="form-label fw-bold">Name</label>
+                                <label htmlFor="pic-name" className="form-label fw-bold">Name</label>
                                 <input type="text" className="form-control" id="pic-name" placeholder="Jhon Doe" onChange={e => setNamePic(e.target.value)}/>
                             </div>
                             <div className="flex-grow-1 mx-2 border">
-                                <label for="pic-nik" className="form-label fw-bold">NIK</label>
+                                <label htmlFor="pic-nik" className="form-label fw-bold">NIK</label>
                                 <input type="text" className="form-control w-30" id="pic-nik" placeholder="1301883-IDN" onChange={e => setNikPic(e.target.value)}/>
                             </div>
                             <div className="flex-grow-1 mx-2 border">
@@ -360,7 +360,7 @@ export default function MainPage() {
                                 </select>
                             </div>
                             <div className="flex-grow-1 mx-2 border">
-                                <label for="pic-nik" className="form-label fw-bold">Upload Tanda Tangan</label>
+                                <label htmlFor="pic-nik" className="form-label fw-bold">Upload Tanda Tangan</label>
                                 <input type="file" accept=".jpg, .png, .jpeg" className="form-control form-control-md" onChange={handleSignatureUpload}/>
                             </div>
 
@@ -372,9 +372,9 @@ export default function MainPage() {
                     <div className="main-box p-3 border rounded shadow-sm">
                         <div className="mb-3 d-flex justify-content-around">
                             <div className="flex-grow-1 mx-2">
-                                <label for="pic-name" className="form-label fw-bold">Employees Data Upload</label>
+                                <label htmlFor="pic-name" className="form-label fw-bold">Employees Data Upload</label>
                                 <input type="file" accept=".xlsx, .xls" className="form-control form-control-md" onChange={handleExcelUpload} />
-                                <button type="button" class="btn btn-md btn-block mt-4" style={{width: "100%", backgroundColor: "#FFB22C"}} onClick={generateAll}><i class="bi bi-file-earmark-arrow-down"></i>{"  "}  Generate All PDF</button>
+                                <button type="button" className="btn btn-md btn-block mt-4" style={{width: "100%", backgroundColor: "#FFB22C"}} onClick={generateAll}><i className="bi bi-file-earmark-arrow-down"></i>{"  "}  Generate All PDF</button>
                             </div>
                             <div className="flex-grow-1 mx-2">
                                 <label className="form-label fw-bold">Pilih Nama Untuk Preview</label>
