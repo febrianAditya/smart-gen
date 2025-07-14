@@ -100,7 +100,7 @@ export default function MainPage() {
           const workbook = XLSX.read(data, { type: "array" });
           const sheet = workbook.Sheets[workbook.SheetNames[0]];
           const json = XLSX.utils.sheet_to_json(sheet);
-          console.log(json, "==> FINAL");
+        //   console.log(json, "==> FINAL");
           
           setDataList2(json);
 
