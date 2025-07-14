@@ -4,7 +4,9 @@ import "./MainPage.css"
 import * as XLSX from 'xlsx';
 import * as PDFLib from "pdf-lib";
 import { ToastContainer, toast, Slide  } from 'react-toastify';
-
+// const { GoogleSpreadsheet } = require("google-spreadsheet")
+// const creds = require("../../credentials.json"); 
+// const doc = new GoogleSpreadsheet("1dA2aP-law-C76WGYVrMqOf3O8ahJeyP9ihI5WWFAnos"); 
 
 export default function MainPage() {
     const [namePic, setNamePic] = useState("")
@@ -15,6 +17,7 @@ export default function MainPage() {
     const [dataList2, setDataList2] = useState([]);
     const [templateArrayBuffer, setTemplateArrayBuffer] = useState(null);
     const [signatureImage, setSignatureImage] = useState(null);
+    const [loadingButton, setLoadingButton] = useState(false)
 
     const safe = (val) => (val === undefined || val === null || val === '') ? '-' : val;
 
@@ -22,7 +25,7 @@ export default function MainPage() {
 
     useEffect(() => {
         // Load template PDF dari folder public
-        fetch("/tanterUpdate.pdf")
+        fetch("/dataDummy.pdf")
           .then((res) => res.arrayBuffer())
           .then((buffer) => {
             setTemplateArrayBuffer(buffer);
@@ -121,7 +124,7 @@ export default function MainPage() {
     };
 
     const generateAll = async () => {
-        if (!namePic || !nikPic || !positionPic || !signatureImage) {
+        if (!namePic || !nikPic || !positionPic) {
             return toast.error('Mohon Isi Seluruh Detail PIC ', {
                 position: "top-right",
                 autoClose: 5000,
@@ -275,6 +278,8 @@ export default function MainPage() {
     
         setHasilPDF(newHasilPDF);
 
+
+
         toast.success("Semua PDF berhasil dibuat. Silakan pilih nama untuk preview.", {
             position: "top-right",
             autoClose: 5000,
@@ -323,6 +328,74 @@ export default function MainPage() {
         };
         reader.readAsDataURL(file); // base64 image
     };
+
+    const sendToSpreadsheet = async (data) => {
+        try {
+            await fetch("https://api.sheetbest.com/sheets/e276dda7-cdc5-47d7-9297-74c36cd0ccc5", {
+                method: "POST",
+                headers: {
+                "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
+            });
+        } catch (error) {
+            console.log(error, "==> apa sih ini");
+        }    
+    };
+
+
+    const handleDownload = async (nama, picName, picNik, picPosition) => {    
+        setLoadingButton(true)    
+        const loadingToastId = toast.loading("Mengirim data dan menyiapkan PDF...");
+        const item = hasilPDF[nama];
+        const { blobUrl, data } = item;
+        let dataKaryawan = dataList2.find(el => el.NamaKaryawan === nama)
+        
+        try {
+            
+            if (!blobUrl) {
+                console.error("Blob URL tidak ditemukan!");
+                return;
+            }
+
+            await sendToSpreadsheet({
+                pic: picName,
+                nikPic: picNik,
+                position: picPosition,
+                namaKaryawan: nama,
+                jenisJamkar: dataKaryawan?.JenisJamkar || "",
+                tanggalTerbit: new Date()
+            });
+
+
+            const link = document.createElement("a");
+            link.href = blobUrl;
+            link.download = `${nama}_serah_terima.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.update(loadingToastId, {
+                render: "Berhasil dikirim & PDF diunduh 🎉",
+                type: "success",
+                isLoading: false,
+                autoClose: 3000,
+                closeOnClick: true,
+            });
+        } catch (error) {
+            console.error("Gagal mengunduh atau mengirim data:", error);
+            toast.update(loadingToastId, {
+                render: "Ups! Gagal kirim atau download 😢",
+                type: "error",
+                isLoading: false,
+                autoClose: 3000,
+                closeOnClick: true,
+            });
+        } finally {
+            setLoadingButton(false);
+        }
+    };  
+
       
     
     
@@ -374,7 +447,7 @@ export default function MainPage() {
                             <div className="flex-grow-1 mx-2">
                                 <label htmlFor="pic-name" className="form-label fw-bold">Employees Data Upload</label>
                                 <input type="file" accept=".xlsx, .xls" className="form-control form-control-md" onChange={handleExcelUpload} />
-                                <button type="button" className="btn btn-md btn-block mt-4" style={{width: "100%", backgroundColor: "#FFB22C"}} onClick={generateAll}><i className="bi bi-file-earmark-arrow-down"></i>{"  "}  Generate All PDF</button>
+                                
                             </div>
                             <div className="flex-grow-1 mx-2">
                                 <label className="form-label fw-bold">Pilih Nama Untuk Preview</label>
@@ -391,23 +464,32 @@ export default function MainPage() {
                                     ))}
                                 </select>
                             </div>
-                            
                         </div>
+                        <div className="d-flex justify-content-end">
+                            <button type="button" className="btn btn-md btn-block mt-1" style={{width: "100%", backgroundColor: "#FAEB92"}} onClick={generateAll}><i className="bi bi-file-earmark-arrow-down"></i>{"  "}  Generate All PDF</button>
+                        </div>
+                        
                         {selectedNama && hasilPDF[selectedNama] && (
-        <>
-          <iframe
-            src={hasilPDF[selectedNama].blobUrl}
-            style={{
-              width: "100%",
-              height: "600px",
-              marginTop: "20px",
-              border: "1px solid #ccc",
-              display: "block",
-            }}
-            title="PDF Preview"
-          ></iframe>
-        </>
-      )}
+                        <>
+                            <iframe
+                                src={hasilPDF[selectedNama].blobUrl}
+                                style={{
+                                width: "100%",
+                                height: "600px",
+                                marginTop: "20px",
+                                border: "1px solid #ccc",
+                                display: "block",
+                                }}
+                                title="PDF Preview"
+                            ></iframe>
+                        <div className="d-flex justify-content-end">
+                            <button className="btn btn-md btn-block mt-3" style={{width: "40%", backgroundColor: "#FAEB92"}} onClick={() => handleDownload(selectedNama, namePic, nikPic, positionPic)} disabled={loadingButton}>
+                                Download PDF & Simpan ke Spreadsheet
+                            </button>
+                        </div>
+                        </>
+                        )}
+
                     </div>
                 </div>
                 <ToastContainer />
