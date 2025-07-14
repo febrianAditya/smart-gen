@@ -4,9 +4,6 @@ import "./MainPage.css"
 import * as XLSX from 'xlsx';
 import * as PDFLib from "pdf-lib";
 import { ToastContainer, toast, Slide  } from 'react-toastify';
-// const { GoogleSpreadsheet } = require("google-spreadsheet")
-// const creds = require("../../credentials.json"); 
-// const doc = new GoogleSpreadsheet("1dA2aP-law-C76WGYVrMqOf3O8ahJeyP9ihI5WWFAnos"); 
 
 export default function MainPage() {
     const [namePic, setNamePic] = useState("")
@@ -331,7 +328,8 @@ export default function MainPage() {
 
     const sendToSpreadsheet = async (data) => {
         try {
-            await fetch("https://api.sheetbest.com/sheets/e276dda7-cdc5-47d7-9297-74c36cd0ccc5", {
+            const url = import.meta.env.VITE_SPREAD_SHEET;
+            await fetch(url, {
                 method: "POST",
                 headers: {
                 "Content-Type": "application/json",
@@ -364,7 +362,7 @@ export default function MainPage() {
                 position: picPosition,
                 namaKaryawan: nama,
                 jenisJamkar: dataKaryawan?.JenisJamkar || "",
-                tanggalTerbit: new Date()
+                tanggalTerbit: new Date().toLocaleString()
             });
 
 
